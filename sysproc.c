@@ -101,3 +101,20 @@ sys_ticketlockTest(void)
 {
   return ticketlockTest();
 }
+
+
+int
+sys_rwinit(void)
+{
+  return rwinit();
+}
+
+int
+sys_rwtest(void)
+{
+  int type;
+  if(argint(0,&type)<0){
+    return -1;
+  }
+  return rwtest(type);
+}

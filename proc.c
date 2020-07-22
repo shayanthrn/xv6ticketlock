@@ -14,6 +14,11 @@ struct {
 } ptable;
 
 struct ticketlock lk;
+struct ticketlock mutex;
+struct ticketlock write;
+
+int sharedcounter=0;
+int readerscount=0;
 
 static struct proc *initproc;
 
@@ -548,4 +553,38 @@ int ticketlockTest(){
   cprintf("ticket number is : %d and index is : %d \n",lk.ticket,lk.index);
   releaseticket(&lk);
   return 0;
+}
+
+int rwinit(){
+  char *name1="mutex";
+  char *name2="write";
+  initlockticket(&mutex,name1);
+  initlockticket(&write,name2);
+  return 0;
+}
+
+int rwtest(int type){
+  if(type==0){ //curr proc is reader
+    acquireticket(&mutex);
+    readerscount++;
+    if(readerscount==1)
+    {
+      acquireticket(&write);
+    }
+      
+    releaseticket(&mutex);
+    //read
+    acquireticket(&mutex);
+    readerscount--;
+    if(readerscount==0){
+      releaseticket(&write);
+    }
+    releaseticket(&mutex);
+  }
+  else{  //curr proc is writer
+      acquireticket(&write);
+      sharedcounter++;
+      releaseticket(&write);
+  }
+  return sharedcounter;
 }

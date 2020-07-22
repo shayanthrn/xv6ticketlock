@@ -15,7 +15,7 @@ initlockticket(struct ticketlock *lk, char *name)
 {
   lk->name = name;
   lk->ticket =0 ;
-  lk->index = -1;
+  lk->index = 0;
   lk->cpu = 0;
 }
 
@@ -30,12 +30,10 @@ acquireticket(struct ticketlock *lk)
   if(holdingticket(lk))
     panic("acquireticket");
 
-
-  myproc()->ticket=fetch_and_add(&lk->index,1);  
-
-
+  myproc()->ticket=fetch_and_add(&lk->index,1);
+  cprintf("ticket proc %d is : %d  and lock is : %d and lock is : %s \n",myproc()->pid,myproc()->ticket,lk->ticket,lk->name);
   while(myproc()->ticket!=lk->ticket);
-   
+  
 
   // Tell the C compiler and the processor to not move loads or stores
   // past this point, to ensure that the critical section's memory
